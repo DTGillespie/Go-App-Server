@@ -1,14 +1,13 @@
 package main
 
 import (
-	staticFileServer "go-app-server/modules"
+	"go-app-server/webServer"
+	"net/http"
 )
 
 func main() {
 
-	moduleInitialization()
-}
-
-func moduleInitialization() {
-	staticFileServer.Init("37561")
+	port := "37561"
+	staticFileDirectory := http.Dir("./static")
+	webServer.Initialize(port, staticFileDirectory)
 }
