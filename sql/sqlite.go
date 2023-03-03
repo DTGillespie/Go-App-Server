@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 func SQLite_Initialize() {
@@ -13,7 +13,7 @@ func SQLite_Initialize() {
 	configureDirectory()
 	configureDatabaseFile()
 
-	db, err := sql.Open("sqlite3", "data/test.db")
+	db, err := sql.Open("sqlite", "data/test.db")
 	if err != nil {
 		log.Fatal(err)
 	}
