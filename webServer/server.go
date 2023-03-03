@@ -8,7 +8,7 @@ import (
 
 func Initialize(port string, dir http.Dir) {
 
-	initializeDatabase()
+	initializeDatabaseContext()
 	defineRouting(dir)
 
 	log.Print("Server Listening on port: ", port)
@@ -18,7 +18,7 @@ func Initialize(port string, dir http.Dir) {
 	}
 }
 
-func initializeDatabase() {
+func initializeDatabaseContext() {
 	sql.SQLite_Initialize()
 }
 

@@ -19,15 +19,15 @@ func SQLite_Initialize() {
 	}
 	defer db.Close()
 
-	testStatement := `
-	create table foo (id integer not null primary key, name text);
-	delete from foo;
-	`
+	schema_Ptr := defineSchemaArr_Ptr()
+	schema := *schema_Ptr
 
-	_, err = db.Exec(testStatement)
-	if err != nil {
-		log.Fatal(err)
-		return
+	for i := 0; i < len(schema); i++ {
+		_, err = db.Exec(schema[i])
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
 	}
 
 }
@@ -44,4 +44,18 @@ func configureDatabaseFile() {
 	}
 
 	defer f.Close()
+}
+
+func defineSchemaArr_Ptr() *[1]string {
+
+	arr := [1]string{
+
+		` CREATE TABLE inventory_instances(
+			ID INTEGER PRIMARY KEY AUTOINCREMENT,
+			Name VARCHAR(255) NOT NULL UNIQUE,
+			Desc VARCHAR(255)
+		);`,
+	}
+
+	return &arr
 }

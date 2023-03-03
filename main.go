@@ -5,9 +5,10 @@ import (
 	"net/http"
 )
 
+var port = "37561"
+var staticFileDirectory = http.Dir("./static")
+
 func main() {
 
-	port := "37561"
-	staticFileDirectory := http.Dir("./static")
 	webServer.Initialize(port, staticFileDirectory)
 }
