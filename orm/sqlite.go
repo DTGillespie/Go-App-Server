@@ -1,4 +1,4 @@
-package sql
+package orm
 
 import (
 	"database/sql"
@@ -8,19 +8,29 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func SQLite_Initialize() {
+var (
+	db     *sql.DB
+	dbName *string
+	schema string
+)
+
+func SQLite_Initialize(dbName_Param *string) {
+	dbName = dbName_Param
 
 	configureDatabaseDirectory()
 	configureDatabaseFile()
 
-	db, err := sql.Open("sqlite", "data/test.db")
+	db_, err := sql.Open("sqlite", "data/"+*dbName+".db")
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
-	defer db.Close()
 
-	schema := loadDatabaseSchema()
-	executeDatabaseSchema(db, schema)
+	defer db_.Close()
+	db = db_
+
+	loadDatabaseSchema()
+	executeDatabaseSchema()
 }
 
 func configureDatabaseDirectory() {
@@ -29,26 +39,27 @@ func configureDatabaseDirectory() {
 }
 
 func configureDatabaseFile() {
-	file, err := os.Create("data/test.db")
+	file, err := os.Create("data/" + *dbName + ".db")
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 
 	defer file.Close()
 }
 
-func loadDatabaseSchema() *string {
+func loadDatabaseSchema() {
 	bytes, err := os.ReadFile("data/schema.sql")
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 
-	s := string(bytes)
-	return &s
+	schema = string(bytes)
 }
 
-func executeDatabaseSchema(db *sql.DB, schema *string) {
-	_, err := db.Exec(*schema)
+func executeDatabaseSchema() {
+	_, err := db.Exec(schema)
 	if err != nil {
 		log.Fatal(err)
 		return
