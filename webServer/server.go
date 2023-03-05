@@ -18,6 +18,10 @@ func Initialize(port string, dir http.Dir) {
 	}
 }
 
+func loadConfigurationSettings() {
+	//https:\\ini.unknwon.io/docs/intro/getting_started
+}
+
 func initializeDatabaseContext() {
 	sql.SQLite_Initialize()
 }

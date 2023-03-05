@@ -10,7 +10,7 @@ import (
 
 func SQLite_Initialize() {
 
-	configureDirectory()
+	configureDatabaseDirectory()
 	configureDatabaseFile()
 
 	db, err := sql.Open("sqlite", "data/test.db")
@@ -19,43 +19,38 @@ func SQLite_Initialize() {
 	}
 	defer db.Close()
 
-	schema_Ptr := defineSchemaArr_Ptr()
-	schema := *schema_Ptr
-
-	for i := 0; i < len(schema); i++ {
-		_, err = db.Exec(schema[i])
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-	}
-
+	schema := loadDatabaseSchema()
+	executeDatabaseSchema(db, schema)
 }
 
-func configureDirectory() {
+func configureDatabaseDirectory() {
 	path := "data"
 	_ = os.Mkdir(path, os.ModePerm)
 }
 
 func configureDatabaseFile() {
-	f, err := os.Create("data/test.db")
+	file, err := os.Create("data/test.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer f.Close()
+	defer file.Close()
 }
 
-func defineSchemaArr_Ptr() *[1]string {
-
-	arr := [1]string{
-
-		` CREATE TABLE inventory_instances(
-			ID INTEGER PRIMARY KEY AUTOINCREMENT,
-			Name VARCHAR(255) NOT NULL UNIQUE,
-			Desc VARCHAR(255)
-		);`,
+func loadDatabaseSchema() *string {
+	bytes, err := os.ReadFile("data/schema.sql")
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	return &arr
+	s := string(bytes)
+	return &s
+}
+
+func executeDatabaseSchema(db *sql.DB, schema *string) {
+	_, err := db.Exec(*schema)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 }
