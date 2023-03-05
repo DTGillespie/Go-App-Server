@@ -1,7 +1,7 @@
 package webServer
 
 import (
-	"go-app-server/orm"
+	"go-app-server/dcm"
 	"log"
 	"net/http"
 )
@@ -15,12 +15,22 @@ type ServerConfigurationSettings struct {
 
 var (
 	settings *ServerConfigurationSettings
+	dbConfig dcm.DatabaseProperties
 )
 
 func Initialize(settings_Param *ServerConfigurationSettings) {
 	settings = settings_Param
 
-	initializeDatabaseContext()
+	dbConfig = dcm.DatabaseProperties{
+		ConnectionHandle: settings.DatabaseName,
+		Dialect:          settings_Param.DatabaseDialect,
+		SQLDirectory:     "data/",
+	}
+
+	dcm.InitializeDatabaseContext(&dbConfig)
+	dcm.LoadSchemaFromFile("schema.sql")
+	dcm.ExecuteDatabaseSchema()
+
 	defineRouting()
 
 	log.Print("Server Listening on port: ", settings.Port)
@@ -29,18 +39,6 @@ func Initialize(settings_Param *ServerConfigurationSettings) {
 		log.Fatal(err)
 		return
 	}
-}
-
-func initializeDatabaseContext() {
-
-	switch settings.DatabaseDialect {
-
-	case "SQLite":
-		orm.SQLite_Initialize(&settings.DatabaseName)
-		break
-
-	}
-
 }
 
 func defineRouting() {
